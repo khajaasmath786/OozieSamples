@@ -1,0 +1,13 @@
+<configuration>
+
+    <!-- ************************** VERY IMPORTANT  ************************** -->
+    <!-- This file is in the Oozie configuration directory only for reference. -->
+    <!-- It is not loaded by Oozie, Oozie uses its own privatecopy.            -->
+    <!-- ************************** VERY IMPORTANT  ************************** -->
+
+     
+       <property>
+           <name>oozie.bundle.application.path</name>
+           <value>hdfs://hdp001-nn:8020/user/mc41946/oozieworkflow/daasbundle-oozie.xml</value>
+    </property>
+    </configuration>

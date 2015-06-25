@@ -1,0 +1,160 @@
+<workflow-app xmlns="uri:oozie:workflow:0.3" name="daas-process-emix1">
+	<start to="ABACUtility"/>
+	<action name="ABACUtility">
+		 <java>
+                        <job-tracker>${jobTracker}</job-tracker>
+                        <name-node>${nameNode}</name-node>
+                        <configuration>
+                                <property>
+                                        <name>mapreduce.job.queuename</name>
+                                        <value>${queueName}</value>
+                                </property>
+                        </configuration>
+                        <main-class>com.mcd.gdw.daas.abac.ABaCUtility</main-class>
+                        <arg>-Dmapreduce.job.queuename=${queueName}</arg>
+			<arg>-c</arg>
+                        <arg>${CONFIG_XML}</arg>
+                        <arg>-ctry</arg>
+                        <arg>${CTRY}</arg>
+			<arg>-lcat</arg>
+			<arg>${LCAT}</arg>
+			<arg>-owsh</arg>
+			<arg>${OWSH}</arg>
+			<arg>-owshtype</arg>
+			<arg>${OWSHTYPE}</arg>
+			<arg>-abacpurge</arg>
+                </java>
+
+		<ok to="mergetofinal"/>
+		<error to="fail"/>
+	</action>
+
+	<action name="mergetofinal">
+                <java>
+                        <job-tracker>${jobTracker}</job-tracker>
+                        <name-node>${nameNode}</name-node>
+                        <configuration>
+                                <property>
+                                        <name>mapreduce.job.queuename</name>
+                                        <value>${queueName}</value>
+                                </property>
+				<property>
+					<name>mapred.job.name</name>
+					<value>mergetofinal</value>
+				</property>
+				<property>
+					<name>dfs.umaskmode</name>
+					<value>${DFS_UMASKMODE}</value>
+				</property>
+                        </configuration>
+                        <main-class>com.mcd.gdw.daas.driver.MergeToFinal</main-class>
+			<arg>-Dmapreduce.job.queuename=${queueName}</arg>
+			<arg>-Dmapreduce.task.timeout=92000000</arg>
+			<arg>-Ddfs.umaskmode=002</arg>	
+			<arg>-Dmapreduce.cluster.mapmemory.mb=4096</arg>
+                        <arg>-Dmapreduce.map.memory.mb=4096</arg>
+                        <arg>-Dio.sort.mb=672</arg>
+                        <arg>-Dmapreduce.map.java.opts=-Xmx3072m</arg>
+                        <arg>-Dmapreduce.reduce.java.opts=-Xmx3072m</arg>
+			<arg>-Dmapreduce.reduce.memory.mb=4096</arg>
+			<arg>-c</arg>
+			<arg>${CONFIG_XML}</arg>
+			<arg>-t</arg>
+			<arg>${FILE_TYPE}</arg>
+			<arg>-f</arg>
+			<arg>${MULTIPLE_INJECT}</arg>
+			<arg>-terrCDList</arg>
+			<arg>${TERRCD_LIST}</arg>
+			<arg>-selectsubtypes</arg>
+			<arg>${FILE_SUB_TYPES}</arg>
+			<arg>-fromAddress</arg>
+			<arg>${EMAIL_FROM_ADDRESS}</arg>
+			<arg>-toAddress</arg>
+			<arg>${EMAIL_TO_ADDRESSES}</arg>
+			<arg>-subject</arg>
+			<arg>${EMAIL_SUBJECT}</arg>
+			<arg>-emailText</arg>
+			<arg>${EMAIL_FAILURE_TEXT}</arg>
+                </java>
+
+                <ok to="movefiles"/>
+                <error to="fail"/>
+        </action>
+        <action name="movefiles">
+	                <java>
+	                        <job-tracker>${jobTracker}</job-tracker>
+	                        <name-node>${nameNode}</name-node>
+	                        <configuration>
+	                                <property>
+	                                        <name>mapreduce.job.queuename</name>
+	                                        <value>${queueName}</value>
+	                                </property>
+					<property>
+						<name>mapred.job.name</name>
+						<value>mergetofinal</value>
+					</property>
+					<property>
+						<name>dfs.umaskmode</name>
+						<value>${DFS_UMASKMODE}</value>
+					</property>
+	                        </configuration>
+	                        <main-class>com.mcd.gdw.daas.driver.MoveFilesInHDFSDriver</main-class>
+				<arg>-Dmapreduce.job.queuename=${queueName}</arg>
+				<arg>-Dmapreduce.task.timeout=92000000</arg>
+				<arg>-Ddfs.umaskmode=002</arg>	
+				<arg>-Dmapreduce.cluster.mapmemory.mb=4096</arg>
+	                        <arg>-Dmapreduce.map.memory.mb=4096</arg>
+	                        <arg>-Dio.sort.mb=672</arg>
+	                        <arg>-Dmapreduce.map.java.opts=-Xmx3072m</arg>
+	                        <arg>-Dmapreduce.reduce.java.opts=-Xmx3072m</arg>
+				<arg>-Dmapreduce.reduce.memory.mb=4096</arg>
+				<arg>-c</arg>
+				<arg>${CONFIG_XML}</arg>
+				<arg>-t</arg>
+				<arg>${FILE_TYPE}</arg>
+				<arg>-i</arg>
+				<arg>${EMIX_INPUT_PATH}</arg>
+				<arg>-o</arg>
+				<arg>${MOVE_FILES_OUTPUT_PATH}</arg>
+				<arg>-selectsubtypes</arg>
+				<arg>${FILE_SUB_TYPES}</arg>
+				<arg>-fromAddress</arg>
+				<arg>${EMAIL_FROM_ADDRESS}</arg>
+				<arg>-toAddress</arg>
+				<arg>${EMAIL_TO_ADDRESSES}</arg>
+				<arg>-subject</arg>
+				<arg>${EMAIL_SUBJECT}</arg>
+				<arg>-emailText</arg>
+			        <arg>${EMAIL_FAILURE_TEXT}</arg>
+	                </java>
+	
+	                <ok to="emailnotification"/>
+	                <error to="fail"/>
+        </action>
+      <action name="emailnotification">
+                <java>
+                        <job-tracker>${jobTracker}</job-tracker>
+                        <name-node>${nameNode}</name-node>
+                        <configuration>
+                                <property>
+                                        <name>mapreduce.job.queuename</name>
+                                        <value>${queueName}</value>
+                                </property>
+                        </configuration>
+                        <main-class>com.mcd.gdw.daas.util.DaaSProcessEmailNotifier</main-class>
+			<arg>${CONFIG_XML}</arg>
+                        <arg>${EMAIL_FROM_ADDRESS}</arg>
+                        <arg>${EMAIL_TO_ADDRESSES}</arg>
+                        <arg>${EMAIL_SUBJECT}</arg>
+                        <arg>${EMAIL_SUCCESS_TEXT}</arg>
+	        </java>
+
+                <ok to="end"/>
+                <error to="fail"/>
+        </action>
+        <kill name="fail">
+		<message>Map/Reduce failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+	</kill>
+	<end name="end"/>
+
+</workflow-app>

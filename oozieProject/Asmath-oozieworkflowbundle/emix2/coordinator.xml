@@ -1,0 +1,41 @@
+<coordinator-app name="daas-process-emix2" frequency="${coord:days(1)}"
+                 start="${START_TIME2}" end="${END_TIME2}"
+                 timezone="America/Chicago"
+                 xmlns="uri:oozie:coordinator:0.2">    
+	 <controls>
+        	<timeout>-1</timeout>
+        	<concurrency>1</concurrency>
+        	<execution>LAST_ONLY</execution>
+      </controls>
+    <datasets>
+        <dataset name="abac" frequency="${coord:days(1)}"
+                 initial-instance="2014-03-12T21:30Z"
+                 timezone="America/Chicago">
+            <uri-template>
+                ${nameNode}${oozie_uri_template}
+            </uri-template>
+            <done-flag></done-flag>
+	    <!--	 <done-flag>trigger.dat</done-flag> -->
+        </dataset>
+        
+    </datasets>
+    <input-events>
+        <data-in name="input" dataset="abac">
+            <instance>${coord:current(0)}</instance>
+        </data-in>
+        
+    </input-events>
+    <action>
+        <workflow>
+            <app-path>${workFlowPathEmix2}</app-path>
+            <configuration>
+                <property>
+                    <name>input</name>
+                    <value>${coord:dataIn('input')}</value>
+                </property>
+                
+            </configuration>
+        </workflow>
+        
+    </action>
+</coordinator-app>

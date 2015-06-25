@@ -1,0 +1,8 @@
+<DaaSConfig>
+  <GBL_Teradata_Connection tpid="GDWPRODP" userId="Load_user" password="8812F7014FF3DDC6B91184F17048ADE5" viewDb="RMDW_V" numSessions="5" additionalConnectionSettings="" />
+  <ABaC_SqlServer_Connection server="66.111.148.20" userId="ABAC" password="D6171899F2A0F4B80C275602CA777645" numFilesLimit="100000" db="ABaCTest.dbo" cacheFileName="abaclist.dat" batchSize="10000" additionalConnectionSettings="" />
+  <Aster_Connection server="142.11.156.21" userId="load_user" password="C5AACE1CAEEEF4350C275602CA777645" />
+  <General altInputPath="" verboseLevel="1" locale="en_US" defaultABaCDateRangeInDays="90" />
+  <HDFS configDir="/etc/hadoop/conf" hdfsRoot="/user/mc41946" landingZoneSubDir="lz" landingZoneArrivalSubDir="abac" workSubDir="work" hiveSubDir="hive" outputSubDir="out" finalSubDir="gold" keepTempDirs="Yes" /> 
+  <File fileType="POS_XML" fileDesc="New POS XML"  fileSubDir="np_xml" inputIsZipFormat="true" filePattern="*.zip" compressOutput="true" numberofReducers="10" skipFilesonSize="true" maxFileSize="53477376" maxFileSizeInMb="51" defaultABaCDateRangeInDays="7"  maskNonCompanyOwnedTerrList="840" mapReduceJavaHeapSize="1024" />
+</DaaSConfig>
